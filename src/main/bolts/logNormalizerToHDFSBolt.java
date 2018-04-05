@@ -21,7 +21,6 @@ public class logNormalizerToHDFSBolt extends BaseRichBolt {
 
     public void execute(Tuple tuple) {
         collector.emit(tuple, new Values(tuple.getString(0)));
-        //System.out.println("to-HDFS:"+tuple.getString(0));
     }
 
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {

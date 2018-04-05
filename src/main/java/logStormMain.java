@@ -71,6 +71,16 @@ public class logStormMain {
                 .withTableName("realtime_service_analyse_day")
                 .withQueryTimeoutSecs(30);
 
+        JdbcMapper mapper_system_minute = new SimpleJdbcMapper("realtime_system_analyse_minute",connection);
+        JdbcInsertBolt jdbcBolt_system_minute = new JdbcInsertBolt(connection,mapper_service_day)
+                .withTableName("realtime_system_analyse_minute")
+                .withQueryTimeoutSecs(30);
+
+        JdbcMapper mapper_system_day = new SimpleJdbcMapper("realtime_system_analyse_day",connection);
+        JdbcInsertBolt jdbcBolt_system_day = new JdbcInsertBolt(connection,mapper_service_day)
+                .withTableName("realtime_system_analyse_day")
+                .withQueryTimeoutSecs(30);
+
         //定义拓扑
         TopologyBuilder builder = new TopologyBuilder();
         builder.setSpout("log-reader", new KafkaSpout(spoutConf),5);
@@ -85,6 +95,12 @@ public class logStormMain {
 
         builder.setBolt("service-analyse-day",new ServiceDayPerformanceAnalyseBolt(),1).fieldsGrouping("log-to-ES",new Fields("couple-log"));
         builder.setBolt("save-service-analyse-day",jdbcBolt_service_day,2).shuffleGrouping("service-analyse-day");
+
+        builder.setBolt("system-analyse-minute",new SystemMinutePerformanceAmalyseBolt(),1).fieldsGrouping("log-to-ES",new Fields("couple-log"));
+        builder.setBolt("save-system-analyse-minute",jdbcBolt_system_minute,2).shuffleGrouping("system-analyse-minute");
+
+        builder.setBolt("system-analyse-day",new SystemDayPerformanceAnalyseBolt(),1).fieldsGrouping("log-to-ES",new Fields("couple-log"));
+        builder.setBolt("save-system-analyse-day",jdbcBolt_system_day,2).shuffleGrouping("system-analyse-day");
 
         //配置
         Config conf = new Config();

@@ -11,11 +11,12 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ServiceDayPerformanceAnalyseBolt extends BaseRichBolt {
 
     private OutputCollector collector;
-    private Map<String,ServiceRealtimePerformanceBean> analyseResultDay = new HashMap<String, ServiceRealtimePerformanceBean>();
+    private ConcurrentHashMap<String,ServiceRealtimePerformanceBean> analyseResultDay = new ConcurrentHashMap<String, ServiceRealtimePerformanceBean>();
 
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         this.collector = outputCollector;
@@ -39,7 +40,7 @@ public class ServiceDayPerformanceAnalyseBolt extends BaseRichBolt {
                     Map.Entry<String,ServiceRealtimePerformanceBean> entry = iterator.next();
                     ServiceRealtimePerformanceBean analyse = entry.getValue();
                     analyse.setStartTime(now.getTime());
-                    collector.emit(new Values(entry.getKey(),analyse.getInvokeTime(),analyse.getAverageTime(),analyse.getErrorTime(),analyse.getErrorPercentage(),analyse.getStartTime()));
+                    collector.emit(new Values(entry.getKey(),analyse.getInvokeTime(),analyse.getAverageTime(),analyse.getErrorTime(),analyse.getErrorPercentage(),analyse.getStartTime(),analyse.getSystem()));
                 }
             }
         },date,60*1000);
@@ -71,6 +72,6 @@ public class ServiceDayPerformanceAnalyseBolt extends BaseRichBolt {
     }
 
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declare(new Fields("serviceName","invokeTime","averageTime","errorTime","errorPercentage","insertTime"));
+        outputFieldsDeclarer.declare(new Fields("serviceName","invokeTime","averageTime","errorTime","errorPercentage","insertTime","system"));
     }
 }

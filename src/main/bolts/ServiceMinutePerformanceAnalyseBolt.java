@@ -37,7 +37,7 @@ public class ServiceMinutePerformanceAnalyseBolt extends BaseRichBolt {
                 for(String serviceName : analyseResultMinute.keySet()){
                     ServiceRealtimePerformanceBean analyse = analyseResultMinute.get(serviceName);
                     analyse.setStartTime(now.getTime());
-                    collector.emit(new Values(serviceName,analyse.getInvokeTime(),analyse.getAverageTime(),analyse.getErrorTime(),analyse.getErrorPercentage(),analyse.getStartTime()));
+                    collector.emit(new Values(serviceName,analyse.getInvokeTime(),analyse.getAverageTime(),analyse.getErrorTime(),analyse.getErrorPercentage(),analyse.getStartTime(),analyse.getMaxTime(),analyse.getSystem()));
                 }
                 analyseResultMinute.clear();
             }
@@ -64,6 +64,6 @@ public class ServiceMinutePerformanceAnalyseBolt extends BaseRichBolt {
     }
 
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declare(new Fields("serviceName","invokeTime","averageTime","errorTime","errorPercentage","startTime"));
+        outputFieldsDeclarer.declare(new Fields("serviceName","invokeTime","averageTime","errorTime","errorPercentage","startTime","maxTime","system"));
     }
 }
